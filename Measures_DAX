@@ -1,0 +1,15 @@
+--to calculate total annual claim 
+Annual Claim = SUM(HMO_Data[Annual_Claims_NGN])
+
+--to calculate total premium
+Total Premium = SUM(HMO_Data[Monthly_Premium_NGN])
+
+--for total members
+Members = DISTINCTCOUNT(HMO_Data[Member_ID])
+
+--to calculate Avgerage Claims per Member
+Avg Claims per Member = DIVIDE([Annual Claim],'Measure'[Members],0)
+
+--to calculate Avgerage premium per Member
+Avg Premium per Member = DIVIDE([Total Premium],'Measure'[Members],0)
+
