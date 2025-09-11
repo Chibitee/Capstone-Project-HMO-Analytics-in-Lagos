@@ -1,8 +1,57 @@
 --to calculate total annual claim 
 Annual Claim = SUM(HMO_Data[Annual_Claims_NGN])
 
+--to calculate total annual claim max
+Max Value = 
+VAR max_val = 
+MAXX(
+    ALL(Dim_Date[Month Name],Dim_Date[Month]),
+    [Annual Claim]
+)
+VAR check = IF(max_val = [Annual Claim], max_val, BLANK())
+RETURN
+check
+
+--to calculate min. total annual claim
+Min Value = 
+VAR min_val = 
+MINX(
+    ALL(Dim_Date[Month Name],Dim_Date[Month]),
+    [Annual Claim]
+)
+VAR check = IF(min_val = [Annual Claim], min_val, BLANK())
+RETURN
+check
+
 --to calculate total premium
 Total Premium = SUM(HMO_Data[Monthly_Premium_NGN])
+
+--to calculate total premium max
+Premium_Max = 
+VAR premium_max =
+MAXX(
+    All(Dim_Date[Month Name],Dim_Date[Month]),
+    [Total Premium]
+)
+VAR color =
+         IF(
+            [Total Premium] = premium_max,
+            "Yellow",
+            "#DAD7CD"
+         )
+RETURN
+color
+
+--to calculate total premium min.
+MinValue = 
+VAR min_val = 
+MINX(
+    ALL(Dim_Date[Month Name],Dim_Date[Month]),
+    [Total Premium]
+)
+VAR Result = IF(min_val = [Total Premium], min_val, BLANK())
+RETURN
+Result
 
 --for total members
 Members = DISTINCTCOUNT(HMO_Data[Member_ID])
@@ -12,4 +61,55 @@ Avg Claims per Member = DIVIDE([Annual Claim],'Measure'[Members],0)
 
 --to calculate Avgerage premium per Member
 Avg Premium per Member = DIVIDE([Total Premium],'Measure'[Members],0)
+
+--to calculate High Cost Members Contribution
+HighCost Members Contribution (%) = 
+DIVIDE( 
+    CALCULATE(
+        [Annual Claim],
+        TOPN(
+            ROUNDUP(DIVIDE('Measure'[Members],10,0),0),
+            ALL(HMO_Data[Member_ID]),
+            CALCULATE([Annual Claim]),
+            DESC
+        ) 
+    ),[Annual Claim],
+    0
+) * 100
+
+-- to calculate loss ratio
+Loss Ratio(%) = DIVIDE([Annual Claim],[Total Premium],0)
+
+---- to calculate loss ratio max
+Loss_Max = 
+VAR Loss_max =
+MAXX(
+    All(Dim_Date[Month Name],Dim_Date[Month]),
+    [Loss Ratio(%)]
+)
+VAR color =
+         IF(
+            [Loss Ratio(%)] = Loss_max,
+            "Red",
+            "#DAD7CD"
+         )
+RETURN
+color
+
+--to calculate zero claim members
+Zero-Claim Members (%) = 
+DIVIDE(
+    CALCULATE(
+        [Members],
+        HMO_Data[Annual_Claims_NGN] = 0
+    ),
+    [Members],
+    0
+)
+
+
+
+
+
+
 
